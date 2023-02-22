@@ -1,9 +1,8 @@
-            TTL CMPE-250 Exercise 6
+            TTL Polled String IO
 ;****************************************************************
+;Uses polling to receive characters and echo them to the terminal
 ;Name:  Helena Lynd
 ;Date:  9/26/22
-;Class:  CMPE-250
-;Section:  Section 03, Wednesday 5:00-6:50 PM
 ;---------------------------------------------------------------
 ;Keil Template for KL05
 ;R. W. Melton
@@ -15,7 +14,7 @@
 ;****************************************************************
 ;Include files
             GET  MKL05Z4.s     ;Included by start.s
-            OPT  1   ;Turn on listing
+            OPT  1	       ;Turn on listing
 ;****************************************************************
 ;EQUates
 TDRE_MASK	EQU		2_10000000
@@ -25,10 +24,10 @@ MAX_STRING	EQU		79
 ;****************************************************************
 ;EQUates
 ;Characters
-CR          EQU  0x0D
-LF          EQU  0x0A
-NULL        EQU  0x00
-LESS_THAN_SYM	EQU	 0x3C
+CR          		EQU	0x0D
+LF          		EQU	0x0A
+NULL        		EQU	0x00
+LESS_THAN_SYM		EQU	0x3C
 GREATER_THAN_SYM	EQU	0x3E
 ;---------------------------------------------------------------
 ;PORTx_PCRn (Port x pin control register n [for pin n])
@@ -175,7 +174,7 @@ UART0_S2_NO_RXINV_BRK10_NO_LBKDETECT_CLEAR_FLAGS  EQU  \
             ENTRY
             EXPORT  Reset_Handler
             IMPORT  Startup
-			IMPORT  LengthStringSB
+	    IMPORT  LengthStringSB
 Reset_Handler  PROC  {}
 main
 ;---------------------------------------------------------------
@@ -185,85 +184,85 @@ main
             BL      Startup
 ;---------------------------------------------------------------
 ;>>>>> begin main program code <<<<<
-			BL		Init_UART0_Polling
+			BL	Init_UART0_Polling
 			
-			LDR		R0,=String1				;Initializes String1 to a NULL character
+			LDR	R0,=String1		;Initializes String1 to a NULL character
 			MOVS	R1,#NULL
 			STRB	R1,[R0,#0]
 			
-CodeSearch	LDR		R0,=prompt				;Prints prompt string
+CodeSearch		LDR	R0,=prompt		;Prints prompt string
 			MOVS	R1,#MAX_STRING
-			BL		PutStringSB
-			BL		GetChar
-			CMP		R0, #0x61		;If Uppercase convert to lowercase
-			BMI		ToLower
+			BL	PutStringSB
+			BL	GetChar
+			CMP	R0, #0x61		;If Uppercase convert to lowercase
+			BMI	ToLower
 			MOVS	R1,R0
-BackIn		CMP		R0, #'g'
-			BEQ		Output
-			CMP		R0, #'i'   
-			BEQ		Output
-			CMP		R0, #'l'
-			BEQ		Output
-			CMP		R0, #'p'
-			BEQ		Output
-			B		CodeSearch
+BackIn			CMP	R0, #'g'
+			BEQ	Output
+			CMP	R0, #'i'   
+			BEQ	Output
+			CMP	R0, #'l'
+			BEQ	Output
+			CMP	R0, #'p'
+			BEQ	Output
+			B	CodeSearch
 			
-ToLower		MOVS	R1,R0
+ToLower			MOVS	R1,R0
 			ADDS	R0,R0, #0x20
-			B		BackIn
+			B	BackIn
 			
-ToUpper		SUBS	R0,R0,#0x20
-			B		Out2
+ToUpper			SUBS	R0,R0,#0x20
+			B	Out2
 			
-Output		MOVS	R2, R0
-			CMP		R1,#0x61      ;If Uppercase, print uppercase value
-			BMI		ToUpper
-Out2		BL		PutChar
+Output			MOVS	R2, R0
+			CMP	R1,#0x61      		;If Uppercase, print uppercase value
+			BMI	ToUpper
+Out2			BL	PutChar
 			MOVS	R0,#CR
-			BL		PutChar
+			BL	PutChar
 			MOVS	R0,#LF
-			BL		PutChar
-			CMP		R2,#'g'
-			BEQ		GCode
-			CMP		R2,#'i'
-			BEQ		ICode
-			CMP		R2,#'l'
-			BEQ		LCode
-			CMP		R2,#'p'
-			BEQ		PCode
+			BL	PutChar
+			CMP	R2,#'g'
+			BEQ	GCode
+			CMP	R2,#'i'
+			BEQ	ICode
+			CMP	R2,#'l'
+			BEQ	LCode
+			CMP	R2,#'p'
+			BEQ	PCode
 
-GCode		MOVS	R0,#LESS_THAN_SYM
-			BL		PutChar
-			LDR		R0,=String1
+GCode			MOVS	R0,#LESS_THAN_SYM
+			BL	PutChar
+			LDR	R0,=String1
 			MOVS	R1,#MAX_STRING
-			BL		GetStringSB
-			B		CodeSearch
+			BL	GetStringSB
+			B	CodeSearch
 
-ICode		LDR		R0,=String1				;Initializes String1 to a NULL character
+ICode			LDR	R0,=String1		;Initializes String1 to a NULL character
 			MOVS	R1,#NULL
 			STRB	R1,[R0,#0]
-			B		EndAndLoop
+			B	EndAndLoop
 			
-LCode		LDR		R0,=String1
+LCode			LDR	R0,=String1
 			MOVS	R1,#MAX_STRING
-			BL		LengthStringSB
-			BL		PutNumU
-			B		EndAndLoop
+			BL	LengthStringSB
+			BL	PutNumU
+			B	EndAndLoop
 			
-PCode		MOVS	R0,#GREATER_THAN_SYM
-			BL		PutChar
-			LDR		R0,=String1
+PCode			MOVS	R0,#GREATER_THAN_SYM
+			BL	PutChar
+			LDR	R0,=String1
 			MOVS	R1,#MAX_STRING
-			BL		PutStringSB
+			BL	PutStringSB
 			MOVS	R0,#GREATER_THAN_SYM
-			BL		PutChar
-			B		EndAndLoop
+			BL	PutChar
+			B	EndAndLoop
 
-EndAndLoop	MOVS	R0,#CR					;Prints carriage return
-			BL		PutChar
-			MOVS	R0,#LF					;Prints line feed
-			BL		PutChar
-			B		CodeSearch
+EndAndLoop		MOVS	R0,#CR			;Prints carriage return
+			BL	PutChar
+			MOVS	R0,#LF			;Prints line feed
+			BL	PutChar
+			B	CodeSearch
 			
 ;>>>>>   end main program code <<<<<
 ;Stay here
@@ -281,67 +280,67 @@ Init_UART0_Polling	PROC	{R0-R13}
 ;	R2 : Stores the values at memory addresses in R0
 ;****************************************************************
 			PUSH	{R0-R2}
-														;Setting up SIM
-			LDR		R0,=SIM_SOPT2							;SIM_SOPT2
-			LDR		R1,=SIM_SOPT2_UART0SRC_MASK				;Want : 2_XXXX01XXXXXXXXXXXXXXXXXXXXXXXXXX
-			LDR		R2,[R0,#0]
+											;Setting up SIM
+			LDR	R0,=SIM_SOPT2							;SIM_SOPT2
+			LDR	R1,=SIM_SOPT2_UART0SRC_MASK						;Want : 2_XXXX01XXXXXXXXXXXXXXXXXXXXXXXXXX
+			LDR	R2,[R0,#0]
 			BICS	R2,R2,R1									;Clear bit 27
-			LDR		R1,=SIM_SOPT2_UART0SRC_MCGFLLCLK
+			LDR	R1,=SIM_SOPT2_UART0SRC_MCGFLLCLK
 			ORRS	R2,R2,R1									;Set bit 26
-			STR		R2,[R0,#0]								
-															;SIM_SOPT5
-			LDR		R0,=SIM_SOPT5								;Want : 2_00000000000000000000000000000000
-			LDR		R1,=SIM_SOPT5_UART0_EXTERN_MASK_CLEAR
-			LDR		R2,[R0,#0]
+			STR	R2,[R0,#0]								
+												;SIM_SOPT5
+			LDR	R0,=SIM_SOPT5								;Want : 2_00000000000000000000000000000000
+			LDR	R1,=SIM_SOPT5_UART0_EXTERN_MASK_CLEAR
+			LDR	R2,[R0,#0]
 			BICS	R2,R2,R1									;Clear all bits
-			STR		R2,[R0,#0]
-															;SIM_SCGC4
-			LDR		R0,=SIM_SCGC4								;Want : 2_XXXXXXXXXXXXXXXXXXXXX0XXXXXXXXXX
-			LDR		R1,=SIM_SCGC4_UART0_MASK
-			LDR		R2,[R0,#0]
+			STR	R2,[R0,#0]
+												;SIM_SCGC4
+			LDR	R0,=SIM_SCGC4								;Want : 2_XXXXXXXXXXXXXXXXXXXXX0XXXXXXXXXX
+			LDR	R1,=SIM_SCGC4_UART0_MASK
+			LDR	R2,[R0,#0]
 			ORRS	R2,R2,R1									;Set bit 10
-			STR		R2,[R0,#0]
-															;SIM_SCGC5
-			LDR		R0,=SIM_SCGC5								;Want : 2_XXXXXXXXXXXXXXXXXXXXX0XXXXXXXXXX
-			LDR		R1,=SIM_SCGC4_UART0_MASK
-			LDR		R2,[R0,#0]
+			STR	R2,[R0,#0]
+												;SIM_SCGC5
+			LDR	R0,=SIM_SCGC5								;Want : 2_XXXXXXXXXXXXXXXXXXXXX0XXXXXXXXXX
+			LDR	R1,=SIM_SCGC4_UART0_MASK
+			LDR	R2,[R0,#0]
 			ORRS	R2,R2,R1									;Set bit 10
-			STR		R2,[R0,#0]
-														;Setting up ports
-			LDR		R0,=PORTB_PCR2							;PCR 2
-			LDR		R1,=PORT_PCR_SET_PTB2_UART0_RX				;Want : 2_XXXXXXX0XXXXXXXXXXXXX010XXXXXXXX
-			STR		R1,[R0,#0]
-			LDR		R0,=PORTB_PCR1							;PCR 1
-			LDR		R1,=PORT_PCR_SET_PTB1_UART0_TX				;Want : 2_XXXXXXX0XXXXXXXXXXXXX010XXXXXXXX
-			STR		R1,[R0,#0]
-														;Setting up UART0
-			LDR		R0,=UART0_BASE							
+			STR	R2,[R0,#0]
+											;Setting up ports
+			LDR	R0,=PORTB_PCR2							;PCR 2
+			LDR	R1,=PORT_PCR_SET_PTB2_UART0_RX						;Want : 2_XXXXXXX0XXXXXXXXXXXXX010XXXXXXXX
+			STR	R1,[R0,#0]
+			LDR	R0,=PORTB_PCR1							;PCR 1
+			LDR	R1,=PORT_PCR_SET_PTB1_UART0_TX						;Want : 2_XXXXXXX0XXXXXXXXXXXXX010XXXXXXXX
+			STR	R1,[R0,#0]
+											;Setting up UART0
+			LDR	R0,=UART0_BASE							
 			MOVS	R1,#UART0_C2_T_R						;Disable UART0
 			LDRB	R2,[R0,#UART0_C2_OFFSET]
 			BICS	R2,R2,R1
 			STRB	R2,[R0,#UART0_C2_OFFSET]
 			MOVS	R1,#UART0_BDH_9600						;UART0_BDH and UART0_BDL
-			STRB	R1,[R0,#UART0_BDH_OFFSET]					;Set baud rate to 9600
+			STRB	R1,[R0,#UART0_BDH_OFFSET]						;Set baud rate to 9600
 			MOVS	R1,#UART0_BDL_9600
 			STRB	R1,[R0,#UART0_BDL_OFFSET]
 			MOVS	R1,#UART0_C1_8N1						;UART0_C1
-			STRB	R1,[R0,#UART0_C1_OFFSET]					;Want : 2_00X0000X
-			MOVS	R1,#UART0_C3_NO_TXINV					;UART_C3
-			STRB	R1,[R0,#UART0_C3_OFFSET]					;Want : 2_XXX00000
-			MOVS	R1,#UART0_C4_NO_MATCH_OSR_16			;UART_C4
-			STRB	R1,[R0,#UART0_C4_OFFSET]					;Want : 2_00001111
-			MOVS	R1,#UART0_C5_NO_DMA_SSR_SYNC			;UART_C5
-			STRB	R1,[R0,#UART0_C5_OFFSET]					;Want : 2_00000000
-			MOVS	R1,#UART0_S1_CLEAR_FLAGS				;UART_S1
-			STRB	R1,[R0,#UART0_S1_OFFSET]					;Clear flags
-			MOVS	R1,#UART0_S2_NO_RXINV_BRK10_NO_LBKDETECT_CLEAR_FLAGS	;UART_S2
-			STRB	R1,[R0,#UART0_S2_OFFSET]									;Clear flags
-			MOVS	R1,#UART0_C2_T_R						;Enable UART0
+			STRB	R1,[R0,#UART0_C1_OFFSET]						;Want : 2_00X0000X
+			MOVS	R1,#UART0_C3_NO_TXINV						;UART_C3
+			STRB	R1,[R0,#UART0_C3_OFFSET]						;Want : 2_XXX00000
+			MOVS	R1,#UART0_C4_NO_MATCH_OSR_16					;UART_C4
+			STRB	R1,[R0,#UART0_C4_OFFSET]						;Want : 2_00001111
+			MOVS	R1,#UART0_C5_NO_DMA_SSR_SYNC					;UART_C5
+			STRB	R1,[R0,#UART0_C5_OFFSET]						;Want : 2_00000000
+			MOVS	R1,#UART0_S1_CLEAR_FLAGS					;UART_S1
+			STRB	R1,[R0,#UART0_S1_OFFSET]						;Clear flags
+			MOVS	R1,#UART0_S2_NO_RXINV_BRK10_NO_LBKDETECT_CLEAR_FLAGS		;UART_S2
+			STRB	R1,[R0,#UART0_S2_OFFSET]						;Clear flags
+			MOVS	R1,#UART0_C2_T_R					;Enable UART0
 			STRB	R1,[R0,#UART0_C2_OFFSET]
 			
-			POP		{R0-R2}
+			POP	{R0-R2}
 			
-			BX		LR
+			BX	LR
 			ENDP
 ;****************************************************************
 GetStringSB	PROC	{R0-R14}
@@ -366,32 +365,32 @@ GetStringSB	PROC	{R0-R14}
 			MOVS	R3,R1					;Initialize R3
 			MOVS	R1,R0					;Initialize R1
 			MOVS	R2,#0					;Initialize R2
-			BL		GetChar					;Initialize R0
-			BL		PutChar
+			BL	GetChar					;Initialize R0
+			BL	PutChar
 			
-StartLoop	CMP		R2,R3					;Check if index (number of characters entered) has hit buffer limit
-			BEQ		BufferHit				;If it has, go to separate buffer loop
-			CMP		R0,#CR					
-			BEQ		EndLoop					;while(character != CR){
+StartLoop		CMP	R2,R3					;Check if index (number of characters entered) has hit buffer limit
+			BEQ	BufferHit				;If it has, go to separate buffer loop
+			CMP	R0,#CR					
+			BEQ	EndLoop					;while(character != CR){
 			STRB	R0,[R1,R2]				;	Store character, then increment pointer
 			ADDS	R2,R2,#1				;	GetChar
-			BL		GetChar					;}
-			BL		PutChar
-			B		StartLoop
+			BL	GetChar					;}
+			BL	PutChar
+			B	StartLoop
 			
-BufferHit	CMP		R0,#CR
-			BEQ		EndLoop
-			BL		GetChar
-			B		BufferHit
+BufferHit		CMP	R0,#CR
+			BEQ	EndLoop
+			BL	GetChar
+			B	BufferHit
 
-EndLoop		MOVS	R0,#NULL				;Store null character at current pointer
+EndLoop			MOVS	R0,#NULL				;Store null character at current pointer
 			STRB	R0,[R1,R2]
 			MOVS	R0,#CR					;Prints carriage return
-			BL		PutChar
+			BL	PutChar
 			MOVS	R0,#LF					;Prints line feed
-			BL		PutChar
+			BL	PutChar
 
-			POP		{R0-R3,PC}
+			POP	{R0-R3,PC}
 			ENDP
 ;****************************************************************
 PutStringSB	PROC	{R0-R14}
@@ -416,17 +415,17 @@ PutStringSB	PROC	{R0-R14}
 			MOVS	R2,#0					;Initialize R2
 			LDRB	R0,[R1,R2]				;Initialize R0
 
-WhileLoop	CMP		R2,R3					;Check if index (number of characters printed) has hit buffer limit
-			BEQ		EndWhileLoop			;If it has, break
-			CMP		R0,#NULL				;while(character != NULL){
-			BEQ		EndWhileLoop			;	PutChar
-			BL		PutChar					;	Read next character (increment pointer)
+WhileLoop		CMP	R2,R3					;Check if index (number of characters printed) has hit buffer limit
+			BEQ	EndWhileLoop				;If it has, break
+			CMP	R0,#NULL				;while(character != NULL){
+			BEQ	EndWhileLoop				;	PutChar
+			BL	PutChar					;	Read next character (increment pointer)
 			ADDS	R2,R2,#1				;}
 			LDRB	R0,[R1,R2]
-			B		WhileLoop
+			B	WhileLoop
 EndWhileLoop
 
-			POP		{R0-R3, PC}
+			POP	{R0-R3, PC}
 			ENDP
 ;****************************************************************
 PutNumU		PROC	{R0-R14}
@@ -449,31 +448,31 @@ PutNumU		PROC	{R0-R14}
 			MOVS	R2,#0			;Initialize R2
 			MOVS	R3,#'0'			;Initialize R3
 
-			CMP		R1,#0
-			BEQ		IfZero
+			CMP	R1,#0
+			BEQ	IfZero
 			
-DivLoop		BL		DIVU				;Ex. After DIVU R1 = 4 R0 = 0
-			BEQ		IfZero
+DivLoop			BL	DIVU			;Ex. After DIVU R1 = 4 R0 = 0
+			BEQ	IfZero
 			PUSH	{R1}
-			MOVS	R1,R0					; Make quotient the new dividend (number to divide) 
-			MOVS	R0,#10					; Make 10 the new divisor (number by which to divide)
-			ADDS	R2,R2,#1				; Increment counter
-			B		DivLoop
+			MOVS	R1,R0			; Make quotient the new dividend (number to divide) 
+			MOVS	R0,#10			; Make 10 the new divisor (number by which to divide)
+			ADDS	R2,R2,#1		; Increment counter
+			B	DivLoop
 
-IfZero		PUSH	{R1}
+IfZero			PUSH	{R1}
 			ADDS	R2,R2,#1
-			B		PrintLoop
+			B	PrintLoop
 
-PrintLoop	CMP		R2,#0
-			BEQ		EndPrint
-			POP		{R0}
+PrintLoop		CMP	R2,#0
+			BEQ	EndPrint
+			POP	{R0}
 			ADDS	R0,R0,R3
-			BL		PutChar
+			BL	PutChar
 			SUBS	R2,R2,#1
-			B		PrintLoop
+			B	PrintLoop
 EndPrint
 			
-			POP		{R0-R3, PC}
+			POP	{R0-R3, PC}
 			ENDP
 ;***************************************************************
 GetChar		PROC	{R1-R13}
@@ -488,16 +487,16 @@ GetChar		PROC	{R1-R13}
 ;***************************************************************
 			PUSH	{R1-R3}
 			
-			LDR		R1,=UART0_BASE	
+			LDR	R1,=UART0_BASE	
 			MOVS	R3,#RDRF_MASK
-GetWhile	LDRB	R2,[R1,#UART0_S1_OFFSET]	    ;Pulls S1 every iteration			;while (RDRF != 1){
-			ANDS	R2,R2,R3					;Clears all bits except 5 (RDRF)	;	check RDRF
-			CMP		R2,#0						;Iterates if RDRF if clear			;}
-			BEQ		GetWhile
-			LDRB	R0,[R1,#UART0_D_OFFSET]											;Read from data register
+GetWhile		LDRB	R2,[R1,#UART0_S1_OFFSET]	    ;Pulls S1 every iteration			;while (RDRF != 1){
+			ANDS	R2,R2,R3			    ;Clears all bits except 5 (RDRF)		;	check RDRF
+			CMP	R2,#0				    ;Iterates if RDRF if clear			;}
+			BEQ	GetWhile
+			LDRB	R0,[R1,#UART0_D_OFFSET] 	    ;Read from data register
 
-			POP		{R1-R3}
-			BX		LR
+			POP	{R1-R3}
+			BX	LR
 			ENDP
 ;***************************************************************
 PutChar		PROC	{R1-R13}
@@ -512,15 +511,15 @@ PutChar		PROC	{R1-R13}
 ;***************************************************************
 			PUSH	{R1-R3}
 
-			LDR		R1,=UART0_BASE	
+			LDR	R1,=UART0_BASE	
 			MOVS	R3,#TDRE_MASK
-PutWhile	LDRB	R2,[R1,#UART0_S1_OFFSET]     ;Pulls S1 every iteration			;while (TDRE != 1) {
-			ANDS	R2,R2,R3					;Clears all bit except 7 (TDRE)		;	check TDRE;
-			BEQ		PutWhile															;}
-			STRB	R0,[R1,#UART0_D_OFFSET]											;Write data to UART data register
+PutWhile		LDRB	R2,[R1,#UART0_S1_OFFSET]    	 ;Pulls S1 every iteration			;while (TDRE != 1) {
+			ANDS	R2,R2,R3			 ;Clears all bit except 7 (TDRE)		;	check TDRE;
+			BEQ	PutWhile									;}
+			STRB	R0,[R1,#UART0_D_OFFSET]		 ;Write data to UART data register
 			
-			POP		{R1-R3}
-			BX		LR
+			POP	{R1-R3}
+			BX	LR
 			ENDP
 ;****************************************************************
 DIVU		PROC	{R2-R14}
@@ -540,47 +539,47 @@ DIVU		PROC	{R2-R14}
 ;****************************************************************
 			PUSH	{R3-R5}
 
-			CMP		R0, #0				;if (divisor == 0) {
-			BEQ		DivBy0				
+			CMP	R0, #0				;if (divisor == 0) {
+			BEQ	DivBy0				
 
-			CMP		R1, #0				;} else if (dividend == 0) {
-			BEQ		Div0				
-										;} else {
-			CMP		R1, R0				;	while (Dividend >= Divisor){
-			BLO		EndEarly			;		
+			CMP	R1, #0				;} else if (dividend == 0) {
+			BEQ	Div0				
+								;} else {
+			CMP	R1, R0				;	while (Dividend >= Divisor){
+			BLO	EndEarly			;		
 			MOVS	R3, #0
-while		SUBS	R1,R1,R0			;		Dividend = Dividend - Divisor
+while			SUBS	R1,R1,R0			;		Dividend = Dividend - Divisor
 			ADDS    R3,#1				;		Quotient = Quotient + 1
-			CMP		R1, R0				;	}
-			BHS		while				;}
+			CMP	R1, R0				;	}
+			BHS	while				;}
 			MOVS    R0, R3				;
-			B		EndWhile							
+			B	EndWhile							
 										
-DivBy0		MRS		R4, APSR			;Set C
-			LDR		R5,=APSR_C_MASK	
+DivBy0			MRS	R4, APSR			;Set C
+			LDR	R5,=APSR_C_MASK	
 			ORRS	R4,R4,R5
-			MSR		APSR, R4
-			B		EndSubR
+			MSR	APSR, R4
+			B	EndSubR
 			
-Div0		MOVS	R0,#0				;Set outputs to 0
+Div0			MOVS	R0,#0				;Set outputs to 0
 			MOVS	R1,#0
-			MRS		R4, APSR			;Set Z
-			LDR		R5,=APSR_Z_MASK
+			MRS	R4, APSR			;Set Z
+			LDR	R5,=APSR_Z_MASK
 			ORRS	R4,R4,R5
-			MSR		APSR, R4
-			B		EndWhile
+			MSR	APSR, R4
+			B	EndWhile
 			
-EndEarly	MOVS	R0,#0				;Set quotient (R0) to 0
-			B		EndWhile
+EndEarly		MOVS	R0,#0				;Set quotient (R0) to 0
+			B	EndWhile
 			
-EndWhile	MRS		R4, APSR			;Clear C
-			LDR		R5,=APSR_C_MASK
+EndWhile		MRS	R4, APSR			;Clear C
+			LDR	R5,=APSR_C_MASK
 			BICS	R4,R4,R5
-			MSR		APSR, R4
-			B		EndSubR
+			MSR	APSR, R4
+			B	EndSubR
 			
-EndSubR		POP     {R3-R5}
-			BX		LR
+EndSubR			POP     {R3-R5}
+			BX	LR
 			ENDP
 ;>>>>>   end subroutine code <<<<<
             ALIGN
