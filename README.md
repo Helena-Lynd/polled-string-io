@@ -15,8 +15,12 @@ When a microprocessor is given a user-input command, a certain flag is set which
 git clone git@github.com:Helena-Lynd/polled-string-io.git
 ```
 - Compile the source files into an executable
+  - If using an IDE, use the "Build" or "Rebuild" feature
 ### Executing
-- Load the executable to your boards flash memory and run it with a connected terminal window open
+- Load the executable to your boards flash memory
+  - If using an IDE, use the "Download" feature
+- Run the program with a connected terminal window open
+  - The board has a button that can be pressed to initiate the program
 - Input one of the following commands (uppercase and lowercase commands are both accepted):
   - G : (Get String) Input a string to be saved.
   - I : (Initialize String) Resets the saved string to an empty string.
