@@ -27,6 +27,6 @@ git clone git@github.com:Helena-Lynd/polled-string-io.git
   - L : (Length of String) Prints the length of the saved string to the terminal.
   - P : (Put String) Prints the saved string to the terminal.
 ## Modifying
-When using the Get String command (G), only up to 79 characters will be saved, even if more are input. This can be modified by updating the value of MAX_STRING in the EQUates section of the file.
+When using the Get String command (G), only up to 79 characters will be saved, even if more are input. This can be modified by updating the value of MAX_STRING in the EQUates section of the asm-src-code file.
 ## Authors<br>
 Helena Lynd
