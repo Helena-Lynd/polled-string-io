@@ -1,6 +1,8 @@
             TTL Polled String IO
 ;****************************************************************
-;Uses polling to receive characters and echo them to the terminal
+;Uses polling to receive characters as commands (G,I,L,P) and
+;perform string operations based on which command is input. The
+;program will only accept command characters as valid input.
 ;Name:  Helena Lynd
 ;Date:  9/26/22
 ;---------------------------------------------------------------
@@ -443,20 +445,20 @@ PutNumU		PROC	{R0-R14}
 ;****************************************************************
 			PUSH	{R0-R3,LR}
 			
-			MOVS	R1,R0			;Initialize R1 to be dividend, input
-			MOVS	R0,#10			;Initialize R0 to be divisor, 10
-			MOVS	R2,#0			;Initialize R2
-			MOVS	R3,#'0'			;Initialize R3
+			MOVS	R1,R0					;Initialize R1 to be dividend, input
+			MOVS	R0,#10					;Initialize R0 to be divisor, 10
+			MOVS	R2,#0					;Initialize R2
+			MOVS	R3,#'0'					;Initialize R3
 
 			CMP	R1,#0
 			BEQ	IfZero
 			
-DivLoop			BL	DIVU			;Ex. After DIVU R1 = 4 R0 = 0
+DivLoop			BL	DIVU					;Ex. After DIVU R1 = 4 R0 = 0
 			BEQ	IfZero
 			PUSH	{R1}
-			MOVS	R1,R0			; Make quotient the new dividend (number to divide) 
-			MOVS	R0,#10			; Make 10 the new divisor (number by which to divide)
-			ADDS	R2,R2,#1		; Increment counter
+			MOVS	R1,R0					;Make quotient the new dividend (number to divide) 
+			MOVS	R0,#10					;Make 10 the new divisor (number by which to divide)
+			ADDS	R2,R2,#1				;Increment counter
 			B	DivLoop
 
 IfZero			PUSH	{R1}
@@ -489,11 +491,11 @@ GetChar		PROC	{R1-R13}
 			
 			LDR	R1,=UART0_BASE	
 			MOVS	R3,#RDRF_MASK
-GetWhile		LDRB	R2,[R1,#UART0_S1_OFFSET]	    ;Pulls S1 every iteration			;while (RDRF != 1){
-			ANDS	R2,R2,R3			    ;Clears all bits except 5 (RDRF)		;	check RDRF
-			CMP	R2,#0				    ;Iterates if RDRF if clear			;}
+GetWhile		LDRB	R2,[R1,#UART0_S1_OFFSET]		;Pulls S1 every iteration			;while (RDRF != 1){
+			ANDS	R2,R2,R3				;Clears all bits except 5 (RDRF)		;	check RDRF
+			CMP	R2,#0					;Iterates if RDRF if clear			;}
 			BEQ	GetWhile
-			LDRB	R0,[R1,#UART0_D_OFFSET] 	    ;Read from data register
+			LDRB	R0,[R1,#UART0_D_OFFSET] 		;Read from data register
 
 			POP	{R1-R3}
 			BX	LR
@@ -513,10 +515,10 @@ PutChar		PROC	{R1-R13}
 
 			LDR	R1,=UART0_BASE	
 			MOVS	R3,#TDRE_MASK
-PutWhile		LDRB	R2,[R1,#UART0_S1_OFFSET]    	 ;Pulls S1 every iteration			;while (TDRE != 1) {
-			ANDS	R2,R2,R3			 ;Clears all bit except 7 (TDRE)		;	check TDRE;
-			BEQ	PutWhile									;}
-			STRB	R0,[R1,#UART0_D_OFFSET]		 ;Write data to UART data register
+PutWhile		LDRB	R2,[R1,#UART0_S1_OFFSET]    		;Pulls S1 every iteration			;while (TDRE != 1) {
+			ANDS	R2,R2,R3				;Clears all bit except 7 (TDRE)			;	check TDRE;
+			BEQ	PutWhile										;}
+			STRB	R0,[R1,#UART0_D_OFFSET]			;Write data to UART data register
 			
 			POP	{R1-R3}
 			BX	LR
@@ -539,40 +541,40 @@ DIVU		PROC	{R2-R14}
 ;****************************************************************
 			PUSH	{R3-R5}
 
-			CMP	R0, #0				;if (divisor == 0) {
+			CMP	R0, #0					;if (divisor == 0) {
 			BEQ	DivBy0				
 
-			CMP	R1, #0				;} else if (dividend == 0) {
+			CMP	R1, #0					;} else if (dividend == 0) {
 			BEQ	Div0				
-								;} else {
-			CMP	R1, R0				;	while (Dividend >= Divisor){
-			BLO	EndEarly			;		
+									;} else {
+			CMP	R1, R0					;	while (Dividend >= Divisor){
+			BLO	EndEarly				;		
 			MOVS	R3, #0
-while			SUBS	R1,R1,R0			;		Dividend = Dividend - Divisor
-			ADDS    R3,#1				;		Quotient = Quotient + 1
-			CMP	R1, R0				;	}
-			BHS	while				;}
-			MOVS    R0, R3				;
+while			SUBS	R1,R1,R0				;		Dividend = Dividend - Divisor
+			ADDS    R3,#1					;		Quotient = Quotient + 1
+			CMP	R1, R0					;	}
+			BHS	while					;}
+			MOVS    R0, R3					
 			B	EndWhile							
 										
-DivBy0			MRS	R4, APSR			;Set C
+DivBy0			MRS	R4, APSR				;Set C
 			LDR	R5,=APSR_C_MASK	
 			ORRS	R4,R4,R5
 			MSR	APSR, R4
 			B	EndSubR
 			
-Div0			MOVS	R0,#0				;Set outputs to 0
+Div0			MOVS	R0,#0					;Set outputs to 0
 			MOVS	R1,#0
-			MRS	R4, APSR			;Set Z
+			MRS	R4, APSR				;Set Z
 			LDR	R5,=APSR_Z_MASK
 			ORRS	R4,R4,R5
 			MSR	APSR, R4
 			B	EndWhile
 			
-EndEarly		MOVS	R0,#0				;Set quotient (R0) to 0
+EndEarly		MOVS	R0,#0					;Set quotient (R0) to 0
 			B	EndWhile
 			
-EndWhile		MRS	R4, APSR			;Clear C
+EndWhile		MRS	R4, APSR				;Clear C
 			LDR	R5,=APSR_C_MASK
 			BICS	R4,R4,R5
 			MSR	APSR, R4
