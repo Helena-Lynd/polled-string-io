@@ -4,7 +4,7 @@ An assembly program that processes user-input commands and receives and transmit
 ![ProgramResults](https://github.com/Helena-Lynd/polled-string-io/blob/main/program-output.png?raw=true)
 
 ## Description<br>
-When a microprocessor is given a user-input command, a certain flag is set which indicates that input has been received and needs to be processed. This program uses polling, a technique that continuously checks that status flag, to determine when to process commands. The program can process commands to save a user input string, determine the length of the string, have the string echoed to the terminal, and reset the string.
+When a microcontroller is given a user-input command, a certain flag is set which indicates that input has been received and needs to be processed. This program uses polling, a technique that continuously checks that status flag, to determine when to process commands. The program can process commands to save a user input string, determine the length of the string, have the string echoed to the terminal, and reset the string.
 ## Getting Started<br>
 ### Dependencies
 - A method to compile the source files into an executable (e.g. Keil uVision5)
