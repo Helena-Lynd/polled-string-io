@@ -195,20 +195,20 @@ main
 CodeSearch		LDR	R0,=prompt		;Prints prompt string
 			MOVS	R1,#MAX_STRING
 			BL	PutStringSB
-			BL	GetChar
+			BL	GetChar			;Takes input character from user
 			CMP	R0, #0x61		;If Uppercase convert to lowercase
 			BMI	ToLower
 			MOVS	R1,R0
-BackIn			CMP	R0, #'g'
-			BEQ	Output
-			CMP	R0, #'i'   
+BackIn			CMP	R0, #'g'		;If correct command input
+			BEQ	Output			;	continue operation
+			CMP	R0, #'i'
 			BEQ	Output
 			CMP	R0, #'l'
 			BEQ	Output
 			CMP	R0, #'p'
 			BEQ	Output
-			B	CodeSearch
-			
+			B	CodeSearch		;else
+							;	 loop back and ask for another character to be input
 ToLower			MOVS	R1,R0
 			ADDS	R0,R0, #0x20
 			B	BackIn
@@ -217,27 +217,27 @@ ToUpper			SUBS	R0,R0,#0x20
 			B	Out2
 			
 Output			MOVS	R2, R0
-			CMP	R1,#0x61      		;If Uppercase, print uppercase value
+			CMP	R1,#0x61      		;If input character was uppercase, convert it back to uppercase
 			BMI	ToUpper
-Out2			BL	PutChar
+Out2			BL	PutChar			;Prints the user typed character to the screen so they can see it
 			MOVS	R0,#CR
 			BL	PutChar
 			MOVS	R0,#LF
 			BL	PutChar
-			CMP	R2,#'g'
+			CMP	R2,#'g'			;If command was "g", branch to get string section of code
 			BEQ	GCode
-			CMP	R2,#'i'
+			CMP	R2,#'i'			;If command was "i", branch to initialize section of code
 			BEQ	ICode
-			CMP	R2,#'l'
+			CMP	R2,#'l'			;If command was "l", branch to length string section of code
 			BEQ	LCode
-			CMP	R2,#'p'
+			CMP	R2,#'p'			;If command was "p", branch to print string section of code
 			BEQ	PCode
 
-GCode			MOVS	R0,#LESS_THAN_SYM
+GCode			MOVS	R0,#LESS_THAN_SYM	;Print "<"
 			BL	PutChar
 			LDR	R0,=String1
 			MOVS	R1,#MAX_STRING
-			BL	GetStringSB
+			BL	GetStringSB		;Get string from user
 			B	CodeSearch
 
 ICode			LDR	R0,=String1		;Initializes String1 to a NULL character
@@ -245,18 +245,18 @@ ICode			LDR	R0,=String1		;Initializes String1 to a NULL character
 			STRB	R1,[R0,#0]
 			B	EndAndLoop
 			
-LCode			LDR	R0,=String1
+LCode			LDR	R0,=String1		;Find length of string and print it
 			MOVS	R1,#MAX_STRING
 			BL	LengthStringSB
 			BL	PutNumU
 			B	EndAndLoop
 			
-PCode			MOVS	R0,#GREATER_THAN_SYM
+PCode			MOVS	R0,#GREATER_THAN_SYM	;Print ">"
 			BL	PutChar
-			LDR	R0,=String1
+			LDR	R0,=String1		;Print saved string
 			MOVS	R1,#MAX_STRING
 			BL	PutStringSB
-			MOVS	R0,#GREATER_THAN_SYM
+			MOVS	R0,#GREATER_THAN_SYM	;Print ">"
 			BL	PutChar
 			B	EndAndLoop
 
